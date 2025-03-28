@@ -120,13 +120,13 @@ Here are some tips that will help you to give more valuable instructions about o
 or methods that can achieve similar results.
 - Always remind me to verify my final answer about the overall task.
 - For different types of calculations, different tools are appropriate:
-  * Cheminformatics: Auto3D, rdkit, OpenBabel
-  * Energy & Force calculations: xTB, pyscf
-  * Geometry optimization: xTB, pyscf
-  * Thermodynamics: xTB, pyscf
+  * Cheminformatics: rdkit, OpenBabel, Dscribe[generate geometric descriptors], morfeus
+  * Energy & Force calculations: xTB, pyscf, gpu4pyscf [when gpu is avail]
+  * Geometry optimization: xTB, pyscf, gpu4pyscf [when gpu is avail]
+  * Thermodynamics: xTB, pyscf, thermoanalysis
   * Transition state initial guess (MEP): GSM-xtb, Pysisyphus-GSM/NEB
-  * Conformational sampling: CREST
-  * IRC: xTB, pyscf
+  * Conformational sampling: auto3d, CREST
+  * IRC: pysisyphus
 - For complex tasks, we may need to use multiple software packages in sequence
 - I can help with input file preparation, calculation setup, and results analysis when specified.
 </tips>
@@ -158,7 +158,7 @@ Please note that our overall task may be very complicated. Here are some tips th
 <tips>
 - If one way fails to provide an answer, try other ways or methods. The answer does exists.
 - If the search snippet is unhelpful but the URL comes from an authoritative source, try visit the website for more details.  
-- When looking for specific numerical values (e.g., dollar amounts), prioritize reliable sources and avoid relying only on search snippets.  
+- When looking for specific numerical values (e.g., solubility, etc.), prioritize reliable sources and avoid relying only on search snippets.  
 - When solving tasks that require web searches, check Wikipedia first before exploring other websites.  
 - When trying to solve math problems, you can try to write python code and use sympy library to solve the problem.
 - Always verify the accuracy of your final answers! Try cross-checking the answers by other ways. (e.g., screenshots, webpage analysis, etc.).  
@@ -169,26 +169,31 @@ correct answer. The right way is to think about the reason for the error and try
 - Search results typically do not provide precise answers. It is not likely to find the answer directly using search toolkit only, the search query should be concise and focuses on finding sources rather than 
 direct answers, as it always need to use other tools to further process the url, e.g. interact with the webpage, extract webpage content, etc. 
 - You have knowledge of various computational chemistry tools that can be used to solve the task:
-  * Cheminformatics: Auto3D, rdkit, OpenBabel
-  * Energy & Force calculations: xTB, pyscf
-  * Geometry optimization: xTB, pyscf
-  * Thermodynamics: xTB, pyscf
+  * Cheminformatics: rdkit, OpenBabel, Dscribe[generate geometric descriptors], morfeus
+  * Energy & Force calculations: xTB, pyscf, gpu4pyscf [when gpu is avail]
+  * Geometry optimization: xTB, pyscf, gpu4pyscf [when gpu is avail]
+  * Thermodynamics: xTB, pyscf, thermoanalysis
   * Transition state initial guess (MEP): GSM-xtb, Pysisyphus-GSM/NEB
-  * Conformational sampling: CREST
-  * IRC: xTB, pyscf
+  * Conformational sampling: auto3d, CREST
+  * IRC: pysisyphus
 - Different methods have different accuracy/cost tradeoffs:
   * Semi-empirical methods (xTB, GFN2) are fast but less accurate
-  * DFT methods (medium cost) offer good balance of accuracy and efficiency
-  * Post-HF methods (CCSD, DLPNO-CCSD, G4) are accurate but computationally expensive
+  * For very large system, even consider using GFN-FF before using GFN2-xTB.
+  * DFT methods (medium cost) offer good balance of accuracy and efficiency, but the selection of functional and basis set is very important.
+  * Post-HF methods (MP2, MP4, CCSD, DLPNO-CCSD) are accurate but computationally expensive. Be careful to use it unless the "chemical accuracy (1 kcal/mol)" is required. Also, these methods are ONLY used to do energy calculations.
 - For geometry optimizations, consider:
   * Force field methods for initial structures
   * Semi-empirical methods for refinement
   * DFT for final optimization
+  * For complex systems, consider adding more steps, for example, 
+    add * GFN-FF after Force field optimization. 
+    use two step DFT level optimizations, use a less complex combination of functional and basis set first, for example, b97-3c or r2scan-3c or b3lyp/6-31g**.
 - For reaction mechanisms:
-  * Identify reactants, products, and possible intermediates
-  * Optimize all structures
-  * Locate transition states
-  * Optimize and confirm the geometry of the transition state by IRC
+  * Identify reactants and products, make sure the atom sequence must be consistent in two ends.
+  * Optimize all structures at same level of theory.
+  * Generate a transition state initial guess by some string methods. (Note: it is always recommended to do the TS initial guess generation at low cost level, like using GFN2-xTB.)
+  * Always use Hessian-based optimizer to optimize the transition states starting from the initial guess.
+  * Confirm the geometry of the transition state by IRC.
 - Always verify your computational setup is appropriate for the chemical system
 </tips>
         """
