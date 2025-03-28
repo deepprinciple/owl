@@ -21,6 +21,7 @@ from camel.toolkits.base import BaseToolkit
 from camel.toolkits.function_tool import FunctionTool
 
 from Auto3D.auto3D import options, smiles2mols
+from yarp.parsers import xyz_write
 
 # from yarp.wrappers.crest import CREST
 # from yarp.wrappers.pyscf import PYSCF
@@ -111,7 +112,7 @@ class Auto3DToolkit(BaseToolkit):
                 xyz_file = None
                 if save_xyz:
                     xyz_file = os.path.join(work_folder, f"{jobname}.xyz")
-                    self._xyz_write(xyz_file, elements, positions)
+                    xyz_write(xyz_file, elements, positions)
                 
                 structure = {
                     'smiles': smiles,
@@ -134,26 +135,6 @@ class Auto3DToolkit(BaseToolkit):
         }
         
         return results
-
-    def _xyz_write(self, name, elements, geo, append_opt=False, comment=''):
-        """
-        Simple wrapper function for writing xyz file
-
-        Args:
-            name (str): Filename of the output
-            elements (List[str]): List of element types
-            geo (np.ndarray): Nx3 array holding the cartesian coordinates
-            append_opt (bool, optional): Whether to append to existing file. Defaults to False.
-            comment (str, optional): Comment line for the XYZ file. Defaults to ''.
-        """
-        open_cond = 'a' if append_opt else 'w'
-            
-        with open(name, open_cond) as f:
-            f.write('{}\n'.format(len(elements)))
-            f.write('{}\n'.format(comment))
-            for count_i, i in enumerate(elements):
-                f.write("{:<20s} {:< 20.8f} {:< 20.8f} {:< 20.8f}\n".format(
-                    i, geo[count_i][0], geo[count_i][1], geo[count_i][2]))
 
     def get_tools(self) -> List[FunctionTool]:
         r"""Returns a list of FunctionTool objects for the Auto3D toolkit.

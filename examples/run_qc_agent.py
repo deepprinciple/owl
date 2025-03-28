@@ -28,9 +28,11 @@ from camel.toolkits import (
 )
 from camel.types import ModelPlatformType, ModelType
 from camel.logger import set_log_level
-from camel.societies import RolePlaying
 
+from owl.qc_utils.qc_role_playing import QCRolePlaying
 from owl.qc_utils.auto3d_toolkit import Auto3DToolkit
+from owl.qc_utils.xtb_toolkit import XTBToolkit
+from owl.qc_utils.molecule_io_toolkit import MoleculeIOToolkit
 from owl.utils import run_society, DocumentProcessingToolkit
 
 base_dir = pathlib.Path(__file__).parent.parent
@@ -40,7 +42,7 @@ load_dotenv(dotenv_path=str(env_path))
 set_log_level(level="DEBUG")
 
 
-def construct_society(question: str) -> RolePlaying:
+def construct_society(question: str) -> QCRolePlaying:
     r"""Construct a society of agents based on the given question.
 
     Args:
@@ -93,9 +95,11 @@ def construct_society(question: str) -> RolePlaying:
     tools = [
         *CodeExecutionToolkit(sandbox="subprocess", verbose=True, require_confirm=True).get_tools(),
         *Auto3DToolkit().get_tools(),
+        *XTBToolkit().get_tools(),
+        *MoleculeIOToolkit().get_tools(),
         # *ImageAnalysisToolkit(model=models["image"]).get_tools(),
         # SearchToolkit().search_duckduckgo,
-        # SearchToolkit().search_bocha,
+        SearchToolkit().search_bocha,
         # *ExcelToolkit().get_tools(),
         # *DocumentProcessingToolkit(model=models["document"]).get_tools(),
         *FileWriteToolkit(output_dir="./").get_tools(),
@@ -113,7 +117,7 @@ def construct_society(question: str) -> RolePlaying:
     }
 
     # Create and return the society
-    society = RolePlaying(
+    society = QCRolePlaying(
         **task_kwargs,
         user_role_name="user",
         user_agent_kwargs=user_agent_kwargs,
